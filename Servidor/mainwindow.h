@@ -29,6 +29,8 @@ private slots:
 
     void mostrarNuevoUsuario(QString _nombre);
 
+    void mostrarUsuarioDesconectado(QString _nombre);
+
     void on_botonLimpiar_clicked();
 
 private:

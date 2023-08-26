@@ -19,7 +19,9 @@ public:
 signals:
     void mostrarMensaje(Mensaje msj);
 
-    //void mostrarNuevoUsuario(QString _nombre);
+    void mostrarNuevoUsuario(QString _nombre);
+
+    void mostrarUsuarioDesconectado(QString _nombre);
 
 private slots:
     void nuevoUsuario();
@@ -31,9 +33,16 @@ private slots:
 private:
     int port;
     QString name;
-    QWebSocketServer* server; // low-level
+    QWebSocketServer* server;
 
-    QMap<QWebSocket*, QString> listaUsuarios;
+    QMap<QString, QWebSocket*> listaUsuarios;
+
+    const QString TIPO_STR = "TIPO";
+    const QString USUARIO_STR = "USUARIO";
+    const QString CONTENIDO_STR = "CONTENIDO";
+    const QString MENSAJE_STR = "MENSAJE";
+    const QString CONEXION_STR = "CONEXION";
+    const QString DESCONEXION_STR = "DESCONEXION";
 };
 
 #endif // SERVIDOR_H

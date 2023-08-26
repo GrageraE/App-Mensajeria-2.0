@@ -36,6 +36,8 @@ void MainWindow::on_Iniciar_clicked()
 
     servidor = new Servidor(puerto, nombreServidor, this);
     connect(this->servidor, &Servidor::mostrarMensaje, this, &MainWindow::mostrarMensaje);
+    connect(this->servidor, &Servidor::mostrarNuevoUsuario, this, &MainWindow::mostrarNuevoUsuario);
+    connect(this->servidor, &Servidor::mostrarUsuarioDesconectado, this, &MainWindow::mostrarUsuarioDesconectado);
 
     this->ui->Logs->appendPlainText("<SISTEMA> Servidor iniciado con puerto " + puertoStr + " y nombre " + nombreServidor);
     this->ui->Iniciar->setEnabled(false);
@@ -45,6 +47,8 @@ void MainWindow::on_Iniciar_clicked()
 void MainWindow::on_Parar_clicked()
 {
     disconnect(this->servidor, &Servidor::mostrarMensaje, this, &MainWindow::mostrarMensaje);
+    disconnect(this->servidor, &Servidor::mostrarNuevoUsuario, this, &MainWindow::mostrarNuevoUsuario);
+    disconnect(this->servidor, &Servidor::mostrarUsuarioDesconectado, this, &MainWindow::mostrarUsuarioDesconectado);
     delete this->servidor;
     this->ui->Logs->appendPlainText("<SISTEMA> Servidor parado");
     qDebug() <<" Servidor terminado";
@@ -59,7 +63,12 @@ void MainWindow::mostrarMensaje(Mensaje _mensaje)
 
 void MainWindow::mostrarNuevoUsuario(QString _nombre)   // TODO: Conectar señal
 {
-    this->ui->Logs->appendPlainText("<SISTEMA> Nuevo usuario: " + _nombre);
+    this->ui->Logs->appendPlainText("Se ha conectado: " + _nombre);
+}
+
+void MainWindow::mostrarUsuarioDesconectado(QString _nombre)
+{
+    this->ui->Logs->appendPlainText("Se ha desconectado: " + _nombre);
 }
 
 void MainWindow::on_botonLimpiar_clicked()
