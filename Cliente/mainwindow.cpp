@@ -6,12 +6,12 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , client(nullptr)
 {
     ui->setupUi(this);
     ui->Logs->setReadOnly(true);
     ui->botonDesconectar->setEnabled(false);
     ui->botonEnviar->setEnabled(false);
-    this->client = nullptr;
 }
 
 MainWindow::~MainWindow()
@@ -33,13 +33,16 @@ void MainWindow::on_actionLimpiar_triggered()
 void MainWindow::on_botonConectar_clicked()
 {
     QString nombreUsuario = this->ui->inputNombre->text();
+    QString puertoStr = this->ui->inputPuerto->text();
     QString servidor = this->ui->inputServidor->text();
-    if(nombreUsuario.isEmpty() || servidor.isEmpty())
+    bool statusPort = true;
+    int puerto = puertoStr.toInt(&statusPort);
+    if(nombreUsuario.isEmpty() || servidor.isEmpty() || !statusPort)
     {
-        QMessageBox::critical(this, "Error", "El nombre o el servidor estan vacios");
+        QMessageBox::critical(this, "Error", "El nombre o el servidor estan vacios; o bien el puerto no es un numero");
         return;
     }
-    this->client = new Cliente(servidor, nombreUsuario, this);
+    this->client = new Cliente(servidor, puerto, nombreUsuario, this);
     connect(this->client, &Cliente::mandarConexion, this, &MainWindow::usuarioConectado);
     connect(this->client, &Cliente::mandarDesconexion, this, &MainWindow::usuarioDesconectado);
     connect(this->client, &Cliente::mandarMensaje, this, &MainWindow::mensaje);
@@ -81,6 +84,7 @@ void MainWindow::mensaje(Mensaje _mensaje)
 void MainWindow::on_botonEnviar_clicked()
 {
     QString mensaje = this->ui->inputMensaje->text();
+    this->ui->inputMensaje->clear();
     if(mensaje.isEmpty()) return;
 
     this->client->enviarMensaje(mensaje);

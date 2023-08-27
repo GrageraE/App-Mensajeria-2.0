@@ -6,6 +6,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , servidor(nullptr)
 {
     ui->setupUi(this);
     ui->Logs->setReadOnly(true);
@@ -18,7 +19,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_actionSalir_triggered()     // Salir
+void MainWindow::on_actionSalir_triggered()
 {
     close();
 }
@@ -50,6 +51,7 @@ void MainWindow::on_Parar_clicked()
     disconnect(this->servidor, &Servidor::mostrarNuevoUsuario, this, &MainWindow::mostrarNuevoUsuario);
     disconnect(this->servidor, &Servidor::mostrarUsuarioDesconectado, this, &MainWindow::mostrarUsuarioDesconectado);
     delete this->servidor;
+    this->servidor = nullptr;
     this->ui->Logs->appendPlainText("<SISTEMA> Servidor parado");
     qDebug() <<" Servidor terminado";
     this->ui->Iniciar->setEnabled(true);

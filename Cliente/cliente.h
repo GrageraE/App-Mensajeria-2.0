@@ -10,7 +10,7 @@ class Cliente : public QObject
 {
     Q_OBJECT
 public:
-    Cliente(QString _servidor,  QString _usuario, QObject* _parent);
+    Cliente(const QString& _servidor, int _puerto, const QString& _usuario, QObject* _parent);
 
     ~Cliente();
 
@@ -34,6 +34,7 @@ private:
     QWebSocket socket;
     QString usuario;
     QString servidor;
+    int puerto;
 
     const QString TIPO_STR = "TIPO";
     const QString USUARIO_STR = "USUARIO";

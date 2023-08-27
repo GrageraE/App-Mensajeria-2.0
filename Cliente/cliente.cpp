@@ -4,11 +4,11 @@
 #include <QJsonDocument>
 #include <QtWebSockets/QWebSocket>
 
-Cliente::Cliente(QString _servidor,  QString _usuario, QObject* _parent)
-    : QObject(_parent), usuario(_usuario), servidor(_servidor)
+Cliente::Cliente(const QString& _servidor, int _puerto, const QString& _usuario, QObject* _parent)
+    : QObject(_parent), usuario(_usuario), servidor(_servidor), puerto(_puerto)
 {
     qDebug() <<" Conectando a " << this->servidor <<" con nombre: " <<this->usuario;
-    this->socket.open(QUrl(this->servidor));
+    this->socket.open(QUrl("ws://" + this->servidor + ":" + QString::number(this->puerto)));
     connect(&this->socket, &QWebSocket::connected, this, &Cliente::conectado);
     connect(&this->socket, &QWebSocket::disconnected, this, &Cliente::desconectado);
 }
