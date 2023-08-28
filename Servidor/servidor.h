@@ -6,7 +6,7 @@
 #include <QtWebSockets/QWebSocketServer>
 #include <QtWebSockets/QWebSocket>
 
-#include "mensaje.h"
+#include "../common/mensaje.h"
 
 class Servidor : public QObject
 {
@@ -14,6 +14,8 @@ class Servidor : public QObject
 public:
     Servidor(int _puerto, const QString& _nombre, QObject* _parent);
     ~Servidor();
+
+    QMap<QString, QWebSocket*> getLista();
 
 
 signals:

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QtWebSockets/QWebSocket>
 
-#include "mensaje.h"
+#include "../common/mensaje.h"
 
 class Cliente : public QObject
 {

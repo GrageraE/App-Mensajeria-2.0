@@ -23,7 +23,7 @@ Cliente::~Cliente()
     this->socket.sendTextMessage(doc.toJson());
 
     this->socket.close();
-    //this->socket.deleteLater();
+    this->socket.deleteLater();
 }
 
 void Cliente::conectado()

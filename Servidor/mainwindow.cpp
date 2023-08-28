@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , servidor(nullptr)
+    , ventana(nullptr)
 {
     ui->setupUi(this);
     ui->Logs->setReadOnly(true);
@@ -15,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    delete this->ventana;
     delete this->servidor;
     delete ui;
 }
@@ -33,7 +35,13 @@ void MainWindow::on_Iniciar_clicked()
         QMessageBox::critical(this, "Error", "No se han especificado nombre o puerto del servidor");
         return;
     }
-    int puerto = puertoStr.toInt();
+    bool portStatus = true;
+    int puerto = puertoStr.toInt(&portStatus);
+    if(!portStatus)
+    {
+        QMessageBox::critical(this, "Error", "El puerto debe ser un valor numérico");
+        return;
+    }
 
     servidor = new Servidor(puerto, nombreServidor, this);
     connect(this->servidor, &Servidor::mostrarMensaje, this, &MainWindow::mostrarMensaje);
@@ -52,7 +60,7 @@ void MainWindow::on_Parar_clicked()
     disconnect(this->servidor, &Servidor::mostrarUsuarioDesconectado, this, &MainWindow::mostrarUsuarioDesconectado);
     delete this->servidor;
     this->servidor = nullptr;
-    this->ui->Logs->appendPlainText("<SISTEMA> Servidor parado");
+    this->ui->Logs->appendPlainText("Servidor parado");
     qDebug() <<" Servidor terminado";
     this->ui->Iniciar->setEnabled(true);
     this->ui->Parar->setEnabled(false);
@@ -63,14 +71,24 @@ void MainWindow::mostrarMensaje(Mensaje _mensaje)
     this->ui->Logs->appendPlainText("<" + _mensaje.usuario + ">" + " " + _mensaje.contenido);
 }
 
-void MainWindow::mostrarNuevoUsuario(QString _nombre)   // TODO: Conectar señal
+void MainWindow::mostrarNuevoUsuario(QString _nombre)
 {
     this->ui->Logs->appendPlainText("Se ha conectado: " + _nombre);
+    // Detectamos si la ventana esta abierta
+    if(this->ventana)
+    {
+        auto lista = this->servidor->getLista();
+        this->ventana->nuevoUsuarioConectado(_nombre, lista[_nombre]->peerAddress().toString());
+    }
 }
 
 void MainWindow::mostrarUsuarioDesconectado(QString _nombre)
 {
     this->ui->Logs->appendPlainText("Se ha desconectado: " + _nombre);
+    if(this->ventana)
+    {
+        this->ventana->usuarioDesconectado(_nombre);
+    }
 }
 
 void MainWindow::on_botonLimpiar_clicked()
@@ -78,3 +96,21 @@ void MainWindow::on_botonLimpiar_clicked()
     this->ui->Logs->clear();
 }
 
+void MainWindow::on_actionLista_Usuarios_triggered()
+{
+    if(!this->servidor)
+    {
+        QMessageBox::critical(this, "Error", "No se ha iniciado el servidor");
+        return;
+    }
+    this->ventana = new ventanaListaUsuarios(this->servidor->getLista(), this);
+    this->ventana->setModal(false);
+    connect(this->ventana, &ventanaListaUsuarios::cerrarVentana, this, &MainWindow::cierreListaUsuario);
+    this->ventana->show();
+}
+
+void MainWindow::cierreListaUsuario()
+{
+    disconnect(this->ventana, &ventanaListaUsuarios::cerrarVentana, this, &MainWindow::cierreListaUsuario);
+    this->ventana = nullptr;
+}

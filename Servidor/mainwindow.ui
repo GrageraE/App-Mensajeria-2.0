@@ -133,11 +133,24 @@
     <property name="title">
      <string>Archivo</string>
     </property>
+    <addaction name="actionLista_Usuarios"/>
+    <addaction name="actionUsuarios_Baneados"/>
+    <addaction name="separator"/>
     <addaction name="actionSalir"/>
    </widget>
    <addaction name="menuArchivo"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionLista_Usuarios">
+   <property name="text">
+    <string>Lista de Usuarios</string>
+   </property>
+  </action>
+  <action name="actionUsuarios_Baneados">
+   <property name="text">
+    <string>Usuarios Baneados</string>
+   </property>
+  </action>
   <action name="actionSalir">
    <property name="text">
     <string>Salir</string>

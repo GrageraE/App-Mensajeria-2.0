@@ -28,8 +28,8 @@ Servidor::~Servidor()
     {
         i.value()->sendTextMessage(msg);
         // Dealojamos a al usuario
+        i.value()->close();
         i.value()->deleteLater();
-        this->listaUsuarios.remove(i.key());
     }
 
     delete this->server;
@@ -89,4 +89,9 @@ void Servidor::desconectado()
 
     QWebSocket* usuario = qobject_cast<QWebSocket*>(sender());
     usuario->deleteLater();
+}
+
+QMap<QString, QWebSocket*> Servidor::getLista()
+{
+    return this->listaUsuarios;
 }

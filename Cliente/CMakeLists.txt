@@ -24,7 +24,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Cliente
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        mensaje.h
+        ../common/mensaje.h
         cliente.h cliente.cpp
     )
 # Define target properties for Android with Qt 6 as:

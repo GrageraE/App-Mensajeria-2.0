@@ -4,7 +4,8 @@
 #include <QMainWindow>
 
 #include "servidor.h"
-#include "mensaje.h"
+#include "../common/mensaje.h"
+#include "ventanalistausuarios.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -33,9 +34,14 @@ private slots:
 
     void on_botonLimpiar_clicked();
 
+    void on_actionLista_Usuarios_triggered();
+
+    void cierreListaUsuario();
+
 private:
     Ui::MainWindow *ui;
 
     Servidor* servidor;
+    ventanaListaUsuarios* ventana;
 };
 #endif // MAINWINDOW_H
