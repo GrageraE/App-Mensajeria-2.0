@@ -32,6 +32,8 @@ private slots:
 
     void usuarioDesconectado(QString _usuario);
 
+    void servidorDesconectado(QString _motivo);
+
     void mensaje(Mensaje _mensaje);
 
     void on_botonEnviar_clicked();

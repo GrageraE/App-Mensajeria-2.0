@@ -46,6 +46,7 @@ void MainWindow::on_botonConectar_clicked()
     this->client = new Cliente(servidor, puerto, nombreUsuario, this);
     connect(this->client, &Cliente::mandarConexion, this, &MainWindow::usuarioConectado);
     connect(this->client, &Cliente::mandarDesconexion, this, &MainWindow::usuarioDesconectado);
+    connect(this->client, &Cliente::mandarDesconexionServidor, this, &MainWindow::servidorDesconectado);
     connect(this->client, &Cliente::mandarMensaje, this, &MainWindow::mensaje);
 
     this->ui->botonConectar->setEnabled(false);
@@ -57,6 +58,7 @@ void MainWindow::on_botonDesconectar_clicked()
 {
     disconnect(this->client, &Cliente::mandarConexion, this, &MainWindow::usuarioConectado);
     disconnect(this->client, &Cliente::mandarDesconexion, this, &MainWindow::usuarioDesconectado);
+    disconnect(this->client, &Cliente::mandarDesconexionServidor, this, &MainWindow::servidorDesconectado);
     disconnect(this->client, &Cliente::mandarMensaje, this, &MainWindow::mensaje);
     delete this->client;
 
@@ -79,18 +81,17 @@ void MainWindow::usuarioConectado(QString _usuario)
 
 void MainWindow::usuarioDesconectado(QString _usuario)
 {
-    if(_usuario.isEmpty())
-    {
-        // Se ha cerrado el servidor
-        this->ui->Logs->appendPlainText("Se ha cerrado el servidor");
-        /*this->on_botonDesconectar_clicked();      <= This crash
-        return;*/
-    }
     this->ui->Logs->appendPlainText("Se ha desconectado: " + _usuario);
     if(this->ventana)
     {
         this->ventana->usuarioDesconectado(_usuario);
     }
+}
+
+void MainWindow::servidorDesconectado(QString _motivo)
+{
+    this->ui->Logs->appendPlainText("Se ha desconectado el servidor. Motivo: " + _motivo);
+    this->on_botonDesconectar_clicked();
 }
 
 void MainWindow::mensaje(Mensaje _mensaje)

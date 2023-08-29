@@ -19,8 +19,8 @@ Servidor::Servidor(int _puerto, const QString& _nombre, QObject* _parent)
 Servidor::~Servidor()
 {
     QJsonObject msg_json;
-    msg_json[TIPO_STR] = MENSAJE_STR;
-    msg_json[USUARIO_STR] = "*";    // TODO: Cambiar tipo para evitar suplantacion
+    msg_json[TIPO_STR] = DESCONEXION_STR;
+    msg_json[USUARIO_STR] = "";
     msg_json[CONTENIDO_STR] = "Servidor cerrado";
     QString msg = QJsonDocument(msg_json).toJson();
 
@@ -48,7 +48,7 @@ void Servidor::nuevoUsuario()
 void Servidor::mensajeRecibido(QString message)
 {
     QWebSocket* socketEmisor = qobject_cast<QWebSocket*>(sender());
-    // TODO: Agregar comprobacion de usuario
+
     auto doc = QJsonDocument::fromJson(message.toUtf8());
     if(doc.isNull())
     {
@@ -71,7 +71,7 @@ void Servidor::mensajeRecibido(QString message)
             // Nombre duplicado
             QJsonObject mensaje;
             mensaje[TIPO_STR] = DESCONEXION_STR;
-            mensaje[USUARIO_STR] = caparazon[USUARIO_STR];
+            mensaje[USUARIO_STR] = "";
             mensaje[CONTENIDO_STR] = "Nombre duplicado";
             socketEmisor->sendTextMessage(QJsonDocument(mensaje).toJson());
             return;     // Mensaje privado

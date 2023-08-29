@@ -23,6 +23,8 @@ signals:
 
     void mandarDesconexion(QString _user);
 
+    void mandarDesconexionServidor(QString _motivo);
+
     void mandarMensaje(Mensaje msj);
 
     void mandarLista(QStringList _lista);
@@ -35,7 +37,7 @@ private slots:
     void mensajeRecibido(QString _msg);
 
 private:
-    QWebSocket socket;
+    QWebSocket* socket;
     QString usuario;
     QString servidor;
     int puerto;

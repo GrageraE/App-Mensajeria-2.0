@@ -9,25 +9,26 @@ Cliente::Cliente(const QString& _servidor, int _puerto, const QString& _usuario,
     : QObject(_parent), usuario(_usuario), servidor(_servidor), puerto(_puerto), conectados(false)
 {
     qDebug() <<" Conectando a " << this->servidor <<" con nombre: " <<this->usuario;
-    this->socket.open(QUrl("ws://" + this->servidor + ":" + QString::number(this->puerto)));
-    connect(&this->socket, &QWebSocket::connected, this, &Cliente::conectado);
-    connect(&this->socket, &QWebSocket::disconnected, this, &Cliente::desconectado);
+    this->socket = new QWebSocket;
+    this->socket->open(QUrl("ws://" + this->servidor + ":" + QString::number(this->puerto)));
+    connect(this->socket, &QWebSocket::connected, this, &Cliente::conectado);
+    connect(this->socket, &QWebSocket::disconnected, this, &Cliente::desconectado);
 }
 
 Cliente::~Cliente()
 {
-    disconnect(&this->socket, &QWebSocket::disconnected, this, &Cliente::desconectado);
+    disconnect(this->socket, &QWebSocket::disconnected, this, &Cliente::desconectado);
     // Mandamos el mensaje de desconexion
     QJsonObject mensaje;
     mensaje[TIPO_STR] = DESCONEXION_STR;
     mensaje[USUARIO_STR] = this->usuario;
     QJsonDocument doc(mensaje);
-    this->socket.sendTextMessage(doc.toJson());
+    this->socket->sendTextMessage(doc.toJson());
 
-    if(this->socket.isValid())
+    if(this->socket->isValid())
     {
-        this->socket.close();
-        this->socket.deleteLater();
+        this->socket->close();
+        this->socket->deleteLater();
     }
 }
 
@@ -35,20 +36,19 @@ void Cliente::conectado()
 {
     qDebug() <<" Conectados";
     this->conectados = true;
-    connect(&this->socket, &QWebSocket::textMessageReceived, this, &Cliente::mensajeRecibido);
+    connect(this->socket, &QWebSocket::textMessageReceived, this, &Cliente::mensajeRecibido);
 
     QJsonObject mensajeConexion;
     mensajeConexion[TIPO_STR] = CONEXION_STR;
     mensajeConexion[USUARIO_STR] = this->usuario;
     QJsonDocument doc(mensajeConexion);
-    this->socket.sendTextMessage(doc.toJson());
+    this->socket->sendTextMessage(doc.toJson());
 }
 
 void Cliente::desconectado()
 {
-    qDebug() <<" Desconectados forzosamente"; // TODO: Manejar motivos de desconexion (baneo, perdida de conexion, etc)
-    this->socket.close();
-    emit mandarDesconexion("");
+    qDebug() <<" Desconectados forzosamente - Inesperado";
+    emit mandarDesconexionServidor("Desconocido");
 }
 
 void Cliente::mensajeRecibido(QString _msg)
@@ -75,11 +75,13 @@ void Cliente::mensajeRecibido(QString _msg)
     }
     else if(caparazon[TIPO_STR] == DESCONEXION_STR)
     {
-        // Se ha desconectado un usuario
-        if(caparazon[USUARIO_STR].toString() == this->usuario)
+        // Se ha desconectado el servidor
+        if(caparazon[USUARIO_STR].toString().isEmpty())
         {
-            emit mandarMensaje({caparazon[CONTENIDO_STR].toString(), ""});
+            emit mandarDesconexionServidor(caparazon[CONTENIDO_STR].toString());
+            return;
         }
+        // Se ha desconectado un usuario
         emit mandarDesconexion(caparazon[USUARIO_STR].toString());
     }
     else if(caparazon[TIPO_STR] == LISTA_STR)
@@ -111,7 +113,7 @@ void Cliente::enviarMensaje(QString _msg)
         caparazonMensaje[CONTENIDO_STR] = _msg;
 
         QJsonDocument doc(caparazonMensaje);
-        this->socket.sendTextMessage(doc.toJson());
+        this->socket->sendTextMessage(doc.toJson());
     }
 }
 
@@ -121,5 +123,5 @@ void Cliente::pedirListaUsuarios()
     mensaje[TIPO_STR] = LISTA_STR;
     mensaje[USUARIO_STR] = this->usuario;
     QJsonDocument doc(mensaje);
-    this->socket.sendTextMessage(doc.toJson());
+    this->socket->sendTextMessage(doc.toJson());
 }
