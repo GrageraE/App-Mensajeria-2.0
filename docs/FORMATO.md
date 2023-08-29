@@ -1,0 +1,65 @@
+# Formato de envío de mensajes
+## Definiciones
+* `TIPO_STR`: Indica la razón del envío. Puede tomar los valores:
+⋅⋅* `MENSAJE_STR`: Es un mensaje cualquiera
+⋅⋅* `CONEXION_STR`: Mensaje de bienvenida, del cliente al servidor
+⋅⋅* `DESCONEXION_STR`: Mensaje de despedida (desconexión voluntaria) o denegación de acceso (si la manda el servidor)
+⋅⋅* `LISTA_STR`: Pide o envía la lista de usuarios conectados
+* `USUARIO_STR`: Es el emisor del mensaje. Si es un string vacío (`""`) este mensaje es envíado por el servidor
+* `CONTENIDO_STR`: Es el contenido del mensaje
+⋅⋅* Si el tipo es `LISTA_STR`, el contenido será la lista de usuarios
+⋅⋅* Si el tipo es `DESCONEXION_STR`, el contenido será la razón de denegación de acceso (nombre duplicado, expulsión, etc)
+⋅⋅* Si el tipo es `CONEXION_STR`, este campo estará vacío
+## Ejemplos
+#### Mensaje 
+```
+{
+  TIPO_STR: MENSAJE_STR,
+  USUARIO_STR: <usuario>,
+  CONTENIDO_STR: <contenido>
+}
+```
+#### Conexión
+```
+{
+  TIPO_STR: CONEXION_STR,
+  USUARIO_STR: <usuario>
+}
+```
+#### Desconexión voluntaria
+```
+{
+  TIPO_STR: DESCONEXION_STR,
+  USUARIO_STR: <usuario>
+}
+```
+#### Desconexión forzosa
+```
+{
+  TIPO_STR: DESCONEXION_STR,
+  USUARIO_STR: "",
+  CONTENIDO_STR: <razon>
+}
+```
+#### Petición de lista de usuarios
+```
+{
+  TIPO_STR: LISTA_STR,
+  USUARIO_STR: <usuario>
+}
+```
+#### Entrega de lista de usuarios
+```
+{
+  TIPO_STR: LISTA_STR,
+  USUARIO_STR: "",
+  CONTENIDO_STR: {
+    "1": <usuario_1>,
+    "2": <usuario_2>,
+    ...
+    }
+}
+```
+## Notas
+1. Este documento cobrará valor con la versión 1.0. Hasta entonces es orientativo.
+2. Como puede verse, en algunos casos `CONTENIDO_STR` puede ser un objeto JSON, siguiendo el formato mostrado.
