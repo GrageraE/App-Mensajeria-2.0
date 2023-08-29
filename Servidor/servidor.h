@@ -17,6 +17,7 @@ public:
 
     QMap<QString, QWebSocket*> getLista();
 
+    void expulsar(QString nombreUsuario);
 
 signals:
     void mostrarMensaje(Mensaje msj);

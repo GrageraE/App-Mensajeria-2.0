@@ -28,6 +28,8 @@ Servidor::~Servidor()
     {
         i.value()->sendTextMessage(msg);
         // Dealojamos a al usuario
+        disconnect(i.value(), &QWebSocket::textMessageReceived, this, &Servidor::mensajeRecibido);
+        disconnect(i.value(), &QWebSocket::disconnected, this, &Servidor::desconectado);
         i.value()->close();
         i.value()->deleteLater();
     }
@@ -81,7 +83,10 @@ void Servidor::mensajeRecibido(QString message)
     }
     else if(caparazon[TIPO_STR] == DESCONEXION_STR)
     {
-        // Se ha desconectado un usuario - Nos llegara un mensaje por la señal del socket
+        // Se ha desconectado un usuario
+        disconnect(socketEmisor, &QWebSocket::textMessageReceived, this, &Servidor::mensajeRecibido);
+        disconnect(socketEmisor, &QWebSocket::disconnected, this, &Servidor::desconectado);
+        socketEmisor->deleteLater();
         this->listaUsuarios.remove(caparazon[USUARIO_STR].toString());
         emit mostrarUsuarioDesconectado(caparazon[USUARIO_STR].toString());
     }
@@ -110,10 +115,26 @@ void Servidor::mensajeRecibido(QString message)
 
 void Servidor::desconectado()
 {
-    qDebug() <<" User disconnected";
+    qDebug() <<" Usuario desconectado inesperadamente";
 
     QWebSocket* usuario = qobject_cast<QWebSocket*>(sender());
     usuario->deleteLater();
+    emit mostrarUsuarioDesconectado(this->listaUsuarios.key(usuario));
+}
+
+void Servidor::expulsar(QString nombreUsuario)
+{
+    QJsonObject msg;
+    msg[TIPO_STR] = DESCONEXION_STR;
+    msg[USUARIO_STR] = "";
+    msg[CONTENIDO_STR] = "Expulsado";
+    auto* socket = this->listaUsuarios.value(nombreUsuario, nullptr);
+    if(!socket)
+    {
+        qDebug() <<" No se encuentra el socket del usuario a expulsar. Nombre: " <<nombreUsuario;
+        return;
+    }
+    socket->sendTextMessage(QJsonDocument(msg).toJson());
 }
 
 QMap<QString, QWebSocket*> Servidor::getLista()

@@ -36,6 +36,8 @@ private slots:
 
     void on_actionLista_Usuarios_triggered();
 
+    void expulsar(QString _nombre, bool _ban);
+
     void cierreListaUsuario();
 
 private:

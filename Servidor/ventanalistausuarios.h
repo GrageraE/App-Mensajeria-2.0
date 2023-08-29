@@ -23,8 +23,12 @@ public:
 signals:
     void cerrarVentana();
 
+    void expulsarUsuario(QString _usuario, bool _ban = false);
+
 private slots:
     void on_pushButton_clicked();
+
+    void on_botonExpulsar_clicked();
 
 private:
     Ui::ventanaListaUsuarios *ui;

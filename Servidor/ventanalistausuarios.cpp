@@ -21,6 +21,7 @@ ventanaListaUsuarios::ventanaListaUsuarios(const QMap<QString, QWebSocket*>& _li
         ui->tablaUsuarios->setItem(i, 1, item);
         ++i;
     }
+    ui->tablaUsuarios->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->tablaUsuarios->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
@@ -71,3 +72,22 @@ void ventanaListaUsuarios::closeEvent(QCloseEvent* event)
     emit cerrarVentana();
     event->accept();
 }
+
+void ventanaListaUsuarios::on_botonExpulsar_clicked()
+{
+    auto usuarios = this->ui->tablaUsuarios->selectedItems();
+    for(auto* item : usuarios)
+    {
+        qDebug() <<" [EXPULSAR] Extraido de la primera columna: " <<item->text();
+        auto nombre = item->text();
+        if(item->column() == 1)
+        {
+            // Extraemos el nombre de la tabla
+            auto itemNombre = this->ui->tablaUsuarios->item(item->row(), 0);
+            nombre = itemNombre->text();
+            qDebug() <<" [EXPULSAR] Extraido de la operacion: " <<nombre;
+        }
+        emit expulsarUsuario(nombre);
+    }
+}
+

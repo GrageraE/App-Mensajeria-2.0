@@ -134,7 +134,6 @@
      <string>Archivo</string>
     </property>
     <addaction name="actionLista_Usuarios"/>
-    <addaction name="actionUsuarios_Baneados"/>
     <addaction name="separator"/>
     <addaction name="actionSalir"/>
    </widget>
@@ -144,11 +143,6 @@
   <action name="actionLista_Usuarios">
    <property name="text">
     <string>Lista de Usuarios</string>
-   </property>
-  </action>
-  <action name="actionUsuarios_Baneados">
-   <property name="text">
-    <string>Usuarios Baneados</string>
    </property>
   </action>
   <action name="actionSalir">

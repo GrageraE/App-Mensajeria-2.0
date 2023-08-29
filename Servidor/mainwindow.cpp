@@ -108,11 +108,25 @@ void MainWindow::on_actionLista_Usuarios_triggered()
     this->ventana = new ventanaListaUsuarios(this->servidor->getLista(), this);
     this->ventana->setModal(false);
     connect(this->ventana, &ventanaListaUsuarios::cerrarVentana, this, &MainWindow::cierreListaUsuario);
+    connect(this->ventana, &ventanaListaUsuarios::expulsarUsuario, this, &MainWindow::expulsar);
     this->ventana->show();
+}
+
+void MainWindow::expulsar(QString _usuario, bool _ban)
+{
+    if(this->servidor)
+    {
+        this->servidor->expulsar(_usuario);
+        if(_ban)
+        {
+            // TODO: Administracion de archivos
+        }
+    }
 }
 
 void MainWindow::cierreListaUsuario()
 {
     disconnect(this->ventana, &ventanaListaUsuarios::cerrarVentana, this, &MainWindow::cierreListaUsuario);
+    disconnect(this->ventana, &ventanaListaUsuarios::expulsarUsuario, this, &MainWindow::expulsar);
     this->ventana = nullptr;
 }
