@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , client(nullptr)
+    , ventana(nullptr)
 {
     ui->setupUi(this);
     ui->Logs->setReadOnly(true);
@@ -68,18 +69,25 @@ void MainWindow::on_botonDesconectar_clicked()
 void MainWindow::usuarioConectado(QString _usuario)
 {
     this->ui->Logs->appendPlainText("Se ha conectado: " + _usuario);
+    if(this->ventana)
+    {
+        this->ventana->nuevoUsuarioConectado(_usuario);
+    }
 }
 
 void MainWindow::usuarioDesconectado(QString _usuario)
 {
     this->ui->Logs->appendPlainText("Se ha desconectado: " + _usuario);
+    if(this->ventana)
+    {
+        this->ventana->usuarioDesconectado(_usuario);
+    }
 }
 
 void MainWindow::mensaje(Mensaje _mensaje)
 {
     this->ui->Logs->appendPlainText("<" + _mensaje.usuario + ">: " + _mensaje.contenido);
 }
-
 
 void MainWindow::on_botonEnviar_clicked()
 {
@@ -88,4 +96,32 @@ void MainWindow::on_botonEnviar_clicked()
     if(mensaje.isEmpty()) return;
 
     this->client->enviarMensaje(mensaje);
+}
+
+void MainWindow::on_actionLista_de_usuarios_triggered()
+{
+    // Pedimos la lista de usuarios al servidor
+    if(!this->client)
+    {
+        QMessageBox::critical(this, "Error", "No se ha conectado a ningún servidor");
+        return;
+    }
+    connect(this->client, &Cliente::mandarLista, this, &MainWindow::listaRecibida);
+    this->client->pedirListaUsuarios();
+}
+
+void MainWindow::listaRecibida(QStringList _lista)
+{
+    // Hemos recibido la lista, abrimos la ventana
+    disconnect(this->client, &Cliente::mandarLista, this, &MainWindow::listaRecibida);
+    this->ventana = new ventanaListaUsuarios(_lista, this);
+    this->ventana->setModal(false);
+    connect(this->ventana, &ventanaListaUsuarios::cerrarVentana, this, &MainWindow::cierreListaUsuario);
+    this->ventana->show();
+}
+
+void MainWindow::cierreListaUsuario()
+{
+    disconnect(this->ventana, &ventanaListaUsuarios::cerrarVentana, this, &MainWindow::cierreListaUsuario);
+    this->ventana = nullptr;
 }

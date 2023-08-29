@@ -16,12 +16,16 @@ public:
 
     void enviarMensaje(QString _msg);
 
+    void pedirListaUsuarios();
+
 signals:
     void mandarConexion(QString _user);
 
     void mandarDesconexion(QString _user);
 
     void mandarMensaje(Mensaje msj);
+
+    void mandarLista(QStringList _lista);
 
 private slots:
     void conectado();
@@ -37,6 +41,7 @@ private:
     int puerto;
 
     const QString TIPO_STR = "TIPO";
+    const QString LISTA_STR = "LISTA";
     const QString USUARIO_STR = "USUARIO";
     const QString CONTENIDO_STR = "CONTENIDO";
     const QString MENSAJE_STR = "MENSAJE";

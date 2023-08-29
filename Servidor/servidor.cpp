@@ -48,7 +48,7 @@ void Servidor::nuevoUsuario()
 void Servidor::mensajeRecibido(QString message)
 {
     QWebSocket* socketEmisor = qobject_cast<QWebSocket*>(sender());
-
+    // TODO: Agregar comprobacion de usuario
     auto doc = QJsonDocument::fromJson(message.toUtf8());
     if(doc.isNull())
     {
@@ -80,6 +80,21 @@ void Servidor::mensajeRecibido(QString message)
     {
         qDebug() <<" Enviando a " <<i.key();
         i.value()->sendTextMessage(message);
+    }
+    if(caparazon[TIPO_STR] == LISTA_STR)
+    {
+        // Nos han pedido la lista. Se la mandamos al usuario que la ha pedido
+        QJsonObject mensaje, listaMensaje;
+        mensaje[TIPO_STR] = LISTA_STR;
+        mensaje[USUARIO_STR] = "";
+        int i = 0;
+        for(auto it = this->listaUsuarios.cbegin(); it != this->listaUsuarios.cend(); ++it)
+        {
+            listaMensaje[QString::number(i)] = it.key();
+            ++i;
+        }
+        mensaje[CONTENIDO_STR] = listaMensaje;
+        socketEmisor->sendTextMessage(QJsonDocument(mensaje).toJson());
     }
 }
 

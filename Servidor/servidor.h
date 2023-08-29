@@ -40,6 +40,7 @@ private:
     QMap<QString, QWebSocket*> listaUsuarios;
 
     const QString TIPO_STR = "TIPO";
+    const QString LISTA_STR = "LISTA";
     const QString USUARIO_STR = "USUARIO";
     const QString CONTENIDO_STR = "CONTENIDO";
     const QString MENSAJE_STR = "MENSAJE";

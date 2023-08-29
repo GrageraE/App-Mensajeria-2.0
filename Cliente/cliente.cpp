@@ -72,6 +72,23 @@ void Cliente::mensajeRecibido(QString _msg)
         // Se ha desconectado un usuario
         emit mandarDesconexion(caparazon[USUARIO_STR].toString());
     }
+    else if(caparazon[TIPO_STR] == LISTA_STR)
+    {
+        if(caparazon[USUARIO_STR] == "")
+        {
+            QStringList lista;
+            QJsonObject listaJson = caparazon[CONTENIDO_STR].toObject();
+            for(auto it = listaJson.begin(); it != listaJson.end(); ++it)
+            {
+                lista.push_back(it.value().toString());
+            }
+            emit mandarLista(lista);
+        }
+    }
+    else
+    {
+        qDebug() <<" Tipo no reconocido";
+    }
 }
 
 void Cliente::enviarMensaje(QString _msg)
@@ -82,5 +99,14 @@ void Cliente::enviarMensaje(QString _msg)
     caparazonMensaje[CONTENIDO_STR] = _msg;
 
     QJsonDocument doc(caparazonMensaje);
+    this->socket.sendTextMessage(doc.toJson());
+}
+
+void Cliente::pedirListaUsuarios()
+{
+    QJsonObject mensaje;
+    mensaje[TIPO_STR] = LISTA_STR;
+    mensaje[USUARIO_STR] = this->usuario;
+    QJsonDocument doc(mensaje);
     this->socket.sendTextMessage(doc.toJson());
 }

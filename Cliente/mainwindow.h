@@ -5,6 +5,7 @@
 
 #include "cliente.h"
 #include "../common/mensaje.h"
+#include "ventanalistausuarios.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,9 +36,16 @@ private slots:
 
     void on_botonEnviar_clicked();
 
+    void on_actionLista_de_usuarios_triggered();
+
+    void listaRecibida(QStringList _lista);
+
+    void cierreListaUsuario();
+
 private:
     Ui::MainWindow *ui;
     Cliente* client;
+    ventanaListaUsuarios* ventana;
 
 };
 #endif // MAINWINDOW_H
