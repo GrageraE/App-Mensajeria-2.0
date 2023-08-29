@@ -64,6 +64,8 @@ void MainWindow::on_Parar_clicked()
     qDebug() <<" Servidor terminado";
     this->ui->Iniciar->setEnabled(true);
     this->ui->Parar->setEnabled(false);
+    if(this->ventana)
+        this->ventana->close();
 }
 
 void MainWindow::mostrarMensaje(Mensaje _mensaje)

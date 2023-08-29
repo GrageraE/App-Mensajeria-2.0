@@ -65,7 +65,17 @@ void Servidor::mensajeRecibido(QString message)
     }
     else if(caparazon[TIPO_STR] == CONEXION_STR)
     {
-        // Se ha conectado un usuario: vinculamos su nombre con la lista
+        // Se ha conectado un usuario: revisamos su nombre y lo vinculamos a la lista
+        if(this->listaUsuarios.contains(caparazon[USUARIO_STR].toString()))
+        {
+            // Nombre duplicado
+            QJsonObject mensaje;
+            mensaje[TIPO_STR] = DESCONEXION_STR;
+            mensaje[USUARIO_STR] = caparazon[USUARIO_STR];
+            mensaje[CONTENIDO_STR] = "Nombre duplicado";
+            socketEmisor->sendTextMessage(QJsonDocument(mensaje).toJson());
+            return;     // Mensaje privado
+        }
         this->listaUsuarios[caparazon[USUARIO_STR].toString()] = socketEmisor;
         emit mostrarNuevoUsuario(caparazon[USUARIO_STR].toString());
     }

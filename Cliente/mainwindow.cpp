@@ -64,6 +64,8 @@ void MainWindow::on_botonDesconectar_clicked()
     this->ui->botonConectar->setEnabled(true);
     this->ui->botonDesconectar->setEnabled(false);
     this->ui->botonEnviar->setEnabled(false);
+    if(this->ventana)
+        this->ventana->close();
 }
 
 void MainWindow::usuarioConectado(QString _usuario)
@@ -77,6 +79,13 @@ void MainWindow::usuarioConectado(QString _usuario)
 
 void MainWindow::usuarioDesconectado(QString _usuario)
 {
+    if(_usuario.isEmpty())
+    {
+        // Se ha cerrado el servidor
+        this->ui->Logs->appendPlainText("Se ha cerrado el servidor");
+        /*this->on_botonDesconectar_clicked();      <= This crash
+        return;*/
+    }
     this->ui->Logs->appendPlainText("Se ha desconectado: " + _usuario);
     if(this->ventana)
     {

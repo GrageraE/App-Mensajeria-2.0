@@ -39,6 +39,7 @@ private:
     QString usuario;
     QString servidor;
     int puerto;
+    bool conectados;
 
     const QString TIPO_STR = "TIPO";
     const QString LISTA_STR = "LISTA";
