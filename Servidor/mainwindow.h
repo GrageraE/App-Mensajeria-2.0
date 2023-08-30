@@ -38,6 +38,8 @@ private slots:
 
     void expulsar(QString _nombre, bool _ban);
 
+    void perdonar(QString _ip);
+
     void cierreListaUsuario();
 
 private:

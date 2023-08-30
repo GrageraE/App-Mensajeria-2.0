@@ -6,61 +6,133 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>268</height>
+    <width>555</width>
+    <height>309</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QTableWidget" name="tablaUsuarios">
+  <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>311</width>
-     <height>211</height>
+     <x>10</x>
+     <y>10</y>
+     <width>531</width>
+     <height>291</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>370</x>
-     <y>200</y>
-     <width>80</width>
-     <height>24</height>
-    </rect>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(240, 240, 240);</string>
    </property>
-   <property name="text">
-    <string>Cerrar</string>
+   <property name="currentIndex">
+    <number>0</number>
    </property>
-  </widget>
-  <widget class="QPushButton" name="botonExpulsar">
-   <property name="geometry">
-    <rect>
-     <x>370</x>
-     <y>40</y>
-     <width>80</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Expulsar</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="botonBanear">
-   <property name="geometry">
-    <rect>
-     <x>370</x>
-     <y>80</y>
-     <width>80</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Banear</string>
-   </property>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>Conectados</string>
+    </attribute>
+    <widget class="QPushButton" name="botonBanear">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>80</y>
+       <width>80</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Banear</string>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="tablaUsuarios">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>371</width>
+       <height>221</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 255);</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="botonExpulsar">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>40</y>
+       <width>80</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Expulsar</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>200</y>
+       <width>80</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Cerrar</string>
+     </property>
+    </widget>
+    <zorder>pushButton</zorder>
+    <zorder>botonBanear</zorder>
+    <zorder>tablaUsuarios</zorder>
+    <zorder>botonExpulsar</zorder>
+   </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Baneados</string>
+    </attribute>
+    <widget class="QListWidget" name="listaBaneados">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>21</y>
+       <width>361</width>
+       <height>201</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(255, 255, 255);</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_2">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>200</y>
+       <width>80</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Cerrar</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_3">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>50</y>
+       <width>80</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Eliminar</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
  </widget>
  <resources/>

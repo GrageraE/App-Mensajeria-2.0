@@ -3,7 +3,7 @@
 
 #include <QCloseEvent>
 
-ventanaListaUsuarios::ventanaListaUsuarios(const QMap<QString, QWebSocket*>& _lista, QWidget *parent) :
+ventanaListaUsuarios::ventanaListaUsuarios(const QMap<QString, QWebSocket*>& _lista, const QStringList& _baneados, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ventanaListaUsuarios)
 {
@@ -23,6 +23,16 @@ ventanaListaUsuarios::ventanaListaUsuarios(const QMap<QString, QWebSocket*>& _li
     }
     ui->tablaUsuarios->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->tablaUsuarios->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    // TODO: Implementar la lista de baneos en la ventana de usuarios
+    i = 0;
+    for(const auto& ip : _baneados)
+    {
+        auto* item = new QListWidgetItem(ip);
+        ui->listaBaneados->insertItem(i, item);
+        ++i;
+    }
+    ui->listaBaneados->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    ui->listaBaneados->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
 ventanaListaUsuarios::~ventanaListaUsuarios()
@@ -59,7 +69,6 @@ void ventanaListaUsuarios::usuarioDesconectado(QString _nombre)
     for(auto* i : elementoL)
     {
         this->ui->tablaUsuarios->removeRow(this->ui->tablaUsuarios->row(i));
-        //delete i; -- This crashes
     }
     ui->tablaUsuarios->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
@@ -91,3 +100,44 @@ void ventanaListaUsuarios::on_botonExpulsar_clicked()
     }
 }
 
+void ventanaListaUsuarios::on_botonBanear_clicked()
+{
+    auto usuarios = this->ui->tablaUsuarios->selectedItems();
+    for(auto* item : usuarios)
+    {
+        qDebug() <<" [EXPULSAR] Extraido de la primera columna: " <<item->text();
+        auto nombre = item->text();
+        if(item->column() == 1)
+        {
+            // Extraemos el nombre de la tabla
+            auto itemNombre = this->ui->tablaUsuarios->item(item->row(), 0);
+            nombre = itemNombre->text();
+            qDebug() <<" [EXPULSAR] Extraido de la operacion: " <<nombre;
+        }
+        emit expulsarUsuario(nombre, true);
+        // Insertamos en la lista
+        auto* listItem = new QListWidgetItem(this->ui->tablaUsuarios->item(item->row(), 1)->text());
+        qDebug() <<" [EXPULSAR] Extraido de la segunda columna: " <<listItem->text();
+        this->ui->listaBaneados->insertItem(this->ui->listaBaneados->count() - 1, listItem->text());
+    }
+    this->ui->listaBaneados->setEditTriggers(QAbstractItemView::NoEditTriggers);
+}
+
+/*
+ * Segunda pestaña
+*/
+void ventanaListaUsuarios::on_pushButton_2_clicked()
+{
+    close();
+}
+
+void ventanaListaUsuarios::on_pushButton_3_clicked()     // Boton Eliminar
+{
+    // Eliminamos de la lista
+    auto usuarios = this->ui->listaBaneados->selectedItems();
+    for(auto* item : usuarios)
+    {
+        emit perdonarUsuario(item->text());
+        delete item;
+    }
+}

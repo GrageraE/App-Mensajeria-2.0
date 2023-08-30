@@ -105,10 +105,11 @@ void MainWindow::on_actionLista_Usuarios_triggered()
         QMessageBox::critical(this, "Error", "No se ha iniciado el servidor");
         return;
     }
-    this->ventana = new ventanaListaUsuarios(this->servidor->getLista(), this);
+    this->ventana = new ventanaListaUsuarios(this->servidor->getLista(), this->servidor->getBaneados(), this);
     this->ventana->setModal(false);
     connect(this->ventana, &ventanaListaUsuarios::cerrarVentana, this, &MainWindow::cierreListaUsuario);
     connect(this->ventana, &ventanaListaUsuarios::expulsarUsuario, this, &MainWindow::expulsar);
+    connect(this->ventana, &ventanaListaUsuarios::perdonarUsuario, this, &MainWindow::perdonar);
     this->ventana->show();
 }
 
@@ -116,17 +117,20 @@ void MainWindow::expulsar(QString _usuario, bool _ban)
 {
     if(this->servidor)
     {
-        this->servidor->expulsar(_usuario);
-        if(_ban)
-        {
-            // TODO: Administracion de archivos
-        }
+        this->servidor->expulsar(_usuario, _ban);
     }
+}
+
+void MainWindow::perdonar(QString _ip)
+{
+    this->servidor->perdonar(_ip);
+    this->ui->Logs->appendPlainText("Perdonado " + _ip);
 }
 
 void MainWindow::cierreListaUsuario()
 {
     disconnect(this->ventana, &ventanaListaUsuarios::cerrarVentana, this, &MainWindow::cierreListaUsuario);
     disconnect(this->ventana, &ventanaListaUsuarios::expulsarUsuario, this, &MainWindow::expulsar);
+    disconnect(this->ventana, &ventanaListaUsuarios::perdonarUsuario, this, &MainWindow::perdonar);
     this->ventana = nullptr;
 }

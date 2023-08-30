@@ -17,7 +17,11 @@ public:
 
     QMap<QString, QWebSocket*> getLista();
 
-    void expulsar(QString nombreUsuario);
+    QStringList getBaneados();
+
+    void expulsar(QString nombreUsuario, bool _ban);
+
+    void perdonar(QString _ip);
 
 signals:
     void mostrarMensaje(Mensaje msj);
@@ -39,6 +43,7 @@ private:
     QWebSocketServer* server;
 
     QMap<QString, QWebSocket*> listaUsuarios;
+    QStringList banList;
 
     const QString TIPO_STR = "TIPO";
     const QString LISTA_STR = "LISTA";

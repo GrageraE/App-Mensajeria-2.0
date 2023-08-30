@@ -4,9 +4,10 @@
 #include <QtWebSockets/QWebSocket>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QFile>
 
 Servidor::Servidor(int _puerto, const QString& _nombre, QObject* _parent)
-    : QObject(_parent), port(_puerto), name(_nombre)
+    : QObject(_parent), port(_puerto), name(_nombre), banList()
 {
     this->server = new QWebSocketServer(this->name, QWebSocketServer::NonSecureMode, this);
     if(this->server->listen(QHostAddress::Any, this->port))
@@ -14,6 +15,20 @@ Servidor::Servidor(int _puerto, const QString& _nombre, QObject* _parent)
         qDebug() <<" Server listening on port " << this->port;
         connect(this->server, &QWebSocketServer::newConnection, this, &Servidor::nuevoUsuario);
     }
+    // Cargamos la lista de ban
+    QFile fileBan("./ban.txt");
+    if(fileBan.open(QIODevice::ReadOnly))
+    {
+        QTextStream stream(&fileBan);
+        while(!stream.atEnd())
+        {
+            QString userBanned = stream.readLine();
+            this->banList.push_back(userBanned);
+            qDebug() <<" Cargando usuario baneado: " <<userBanned;
+        }
+        fileBan.close();
+    }
+    else qDebug() <<" No se puede cargar la lista de baneos.";
 }
 
 Servidor::~Servidor()
@@ -33,6 +48,18 @@ Servidor::~Servidor()
         i.value()->close();
         i.value()->deleteLater();
     }
+    // Guardamos la lista de baneos
+    QFile file("./ban.txt");
+    if(file.open(QIODevice::ReadWrite | QIODevice::Truncate))
+    {
+        QTextStream stream(&file);
+        for(const auto& ip : this->banList)
+        {
+            stream << ip <<"\n";
+        }
+        file.close();
+    }
+    else qDebug() <<" No se puede guardar la lista de baneos";
 
     delete this->server;
 }
@@ -78,6 +105,16 @@ void Servidor::mensajeRecibido(QString message)
             socketEmisor->sendTextMessage(QJsonDocument(mensaje).toJson());
             return;     // Mensaje privado
         }
+        else if(this->banList.contains(socketEmisor->peerAddress().toString()))
+        {
+            // Usuario baneado
+            QJsonObject mensaje;
+            mensaje[TIPO_STR] = DESCONEXION_STR;
+            mensaje[USUARIO_STR] = "";
+            mensaje[CONTENIDO_STR] = "Usuario baneado";
+            socketEmisor->sendTextMessage(QJsonDocument(mensaje).toJson());
+            return;
+        }
         this->listaUsuarios[caparazon[USUARIO_STR].toString()] = socketEmisor;
         emit mostrarNuevoUsuario(caparazon[USUARIO_STR].toString());
     }
@@ -122,7 +159,7 @@ void Servidor::desconectado()
     emit mostrarUsuarioDesconectado(this->listaUsuarios.key(usuario));
 }
 
-void Servidor::expulsar(QString nombreUsuario)
+void Servidor::expulsar(QString nombreUsuario, bool _ban)
 {
     QJsonObject msg;
     msg[TIPO_STR] = DESCONEXION_STR;
@@ -135,9 +172,26 @@ void Servidor::expulsar(QString nombreUsuario)
         return;
     }
     socket->sendTextMessage(QJsonDocument(msg).toJson());
+
+    if(_ban)
+    {
+        // La lista se guardara a la salida
+        this->banList.push_back(this->listaUsuarios.value(nombreUsuario)->peerAddress().toString());
+    }
+}
+
+void Servidor::perdonar(QString _ip)
+{
+    qDebug() <<" Perdonando a IP: " << _ip;
+    this->banList.removeAll(_ip);
 }
 
 QMap<QString, QWebSocket*> Servidor::getLista()
 {
     return this->listaUsuarios;
+}
+
+QStringList Servidor::getBaneados()
+{
+    return this->banList;
 }
