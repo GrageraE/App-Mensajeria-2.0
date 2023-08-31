@@ -17,7 +17,12 @@ public:
     {
         QString nombreUsuario;
         QString ip;
-        quint32 puerto;
+        QString puerto;
+
+        bool operator== (const DatosServidor& other) const
+        {
+            return (this->ip == other.ip && this->nombreUsuario == other.nombreUsuario && this->puerto == other.puerto);
+        }
     };
 
     explicit ventanaServidores(QWidget *parent = nullptr);
@@ -25,14 +30,19 @@ public:
 
     DatosServidor getResultado();
 
+    void agregarDatos(const DatosServidor& _datos);
+
 private slots:
     void on_pushButton_clicked();
 
     void on_botonConectar_clicked();
 
+    void on_botonEliminar_clicked();
+
 private:
     Ui::ventanaServidores *ui;
     DatosServidor resultado;
+    QList<DatosServidor> listaServidores;
 };
 
 #endif // VENTANASERVIDORES_H

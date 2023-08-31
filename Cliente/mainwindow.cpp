@@ -138,17 +138,33 @@ void MainWindow::cierreListaUsuario()
     this->ventana = nullptr;
 }
 
-void MainWindow::on_actionLista_de_Servidores_triggered()
+void MainWindow::on_actionLista_triggered()
 {
     if(this->client)
     {
         QMessageBox::critical(this, "Error", "Desconéctate para abrir la lista de servidores");
-        return;
+            return;
     }
     ventanaServidores v(this);
     v.setModal(true);
     if(v.exec() == QDialog::Accepted)
     {
-
+        auto result = v.getResultado();
+        this->ui->inputNombre->setText(result.nombreUsuario);
+        this->ui->inputServidor->setText(result.ip);
+        this->ui->inputPuerto->setText(result.puerto);
     }
 }
+
+
+void MainWindow::on_actionA_adir_triggered()
+{
+    if(!this->client)
+    {
+        QMessageBox::critical(this, "Error", "Conéctate a un servidor para guardar sus datos");
+        return;
+    }
+    ventanaServidores v;
+    v.agregarDatos({this->ui->inputNombre->text(), this->ui->inputServidor->text(), this->ui->inputPuerto->text()});
+}
+
