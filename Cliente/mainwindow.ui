@@ -167,6 +167,7 @@
      <string>Archivo</string>
     </property>
     <addaction name="actionLista_de_usuarios"/>
+    <addaction name="actionLista_de_Servidores"/>
     <addaction name="separator"/>
     <addaction name="actionLimpiar"/>
     <addaction name="separator"/>
@@ -177,7 +178,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLista_de_usuarios">
    <property name="text">
-    <string>Lista de usuarios</string>
+    <string>Lista de Usuarios</string>
    </property>
   </action>
   <action name="actionLimpiar">
@@ -188,6 +189,11 @@
   <action name="actionSalir">
    <property name="text">
     <string>Salir</string>
+   </property>
+  </action>
+  <action name="actionLista_de_Servidores">
+   <property name="text">
+    <string>Lista de Servidores</string>
    </property>
   </action>
  </widget>

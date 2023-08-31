@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
+#include "ventanaservidores.h"
 #include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -10,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ventana(nullptr)
 {
     ui->setupUi(this);
+    this->setWindowTitle("Cliente");
     ui->Logs->setReadOnly(true);
     ui->botonDesconectar->setEnabled(false);
     ui->botonEnviar->setEnabled(false);
@@ -134,4 +136,19 @@ void MainWindow::cierreListaUsuario()
 {
     disconnect(this->ventana, &ventanaListaUsuarios::cerrarVentana, this, &MainWindow::cierreListaUsuario);
     this->ventana = nullptr;
+}
+
+void MainWindow::on_actionLista_de_Servidores_triggered()
+{
+    if(this->client)
+    {
+        QMessageBox::critical(this, "Error", "Desconéctate para abrir la lista de servidores");
+        return;
+    }
+    ventanaServidores v(this);
+    v.setModal(true);
+    if(v.exec() == QDialog::Accepted)
+    {
+
+    }
 }

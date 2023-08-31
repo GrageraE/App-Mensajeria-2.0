@@ -27,6 +27,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ../common/mensaje.h
         cliente.h cliente.cpp
         ventanalistausuarios.h ventanalistausuarios.cpp ventanalistausuarios.ui
+        ventanaservidores.h ventanaservidores.cpp ventanaservidores.ui
 
     )
 # Define target properties for Android with Qt 6 as:

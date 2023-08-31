@@ -44,6 +44,8 @@ private slots:
 
     void cierreListaUsuario();
 
+    void on_actionLista_de_Servidores_triggered();
+
 private:
     Ui::MainWindow *ui;
     Cliente* client;

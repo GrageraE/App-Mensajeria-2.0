@@ -8,6 +8,7 @@ ventanaListaUsuarios::ventanaListaUsuarios(const QMap<QString, QWebSocket*>& _li
     ui(new Ui::ventanaListaUsuarios)
 {
     ui->setupUi(this);
+    this->setWindowTitle("Lista de Usuarios");
     ui->tablaUsuarios->setColumnCount(2);
     ui->tablaUsuarios->setHorizontalHeaderLabels(QStringList({"Nombre", "IP"}));
 
@@ -23,7 +24,7 @@ ventanaListaUsuarios::ventanaListaUsuarios(const QMap<QString, QWebSocket*>& _li
     }
     ui->tablaUsuarios->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->tablaUsuarios->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    // TODO: Implementar la lista de baneos en la ventana de usuarios
+
     i = 0;
     for(const auto& ip : _baneados)
     {

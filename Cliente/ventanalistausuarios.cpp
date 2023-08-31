@@ -8,6 +8,7 @@ ventanaListaUsuarios::ventanaListaUsuarios(const QStringList& _lista, QWidget *p
     ui(new Ui::ventanaListaUsuarios)
 {
     ui->setupUi(this);
+    this->setWindowTitle("Lista de Usuarios");
     ui->tablaUsuarios->setColumnCount(1);
     ui->tablaUsuarios->setHorizontalHeaderLabels(QStringList({"Nombre"}));
 

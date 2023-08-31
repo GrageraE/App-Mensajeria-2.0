@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->Logs->setReadOnly(true);
     ui->Parar->setEnabled(false);
+    this->setWindowTitle("Servidor");
 }
 
 MainWindow::~MainWindow()
