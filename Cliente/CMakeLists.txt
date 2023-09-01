@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
+include(FetchContent)
 
 project(Cliente VERSION 0.1 LANGUAGES CXX)
 
@@ -46,6 +47,17 @@ else()
             ${PROJECT_SOURCES}
         )
     endif()
+endif()
+
+if (ANDROID)
+    FetchContent_Declare(
+      android_openssl
+      DOWNLOAD_EXTRACT_TIMESTAMP true
+      URL      https://github.com/KDAB/android_openssl/archive/refs/heads/master.zip
+#      URL_HASH MD5=c97d6ad774fab16be63b0ab40f78d945 #optional
+    )
+    FetchContent_MakeAvailable(android_openssl)
+    include(${android_openssl_SOURCE_DIR}/android_openssl.cmake)
 endif()
 
 target_link_libraries(Cliente PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::WebSockets)

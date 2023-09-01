@@ -54,6 +54,8 @@ void MainWindow::on_botonConectar_clicked()
     this->ui->botonConectar->setEnabled(false);
     this->ui->botonDesconectar->setEnabled(true);
     this->ui->botonEnviar->setEnabled(true);
+    // Para que funcione la tecla enter
+    connect(this->ui->inputMensaje, &QLineEdit::returnPressed, this, &MainWindow::enterEnviar);
 }
 
 void MainWindow::on_botonDesconectar_clicked()
@@ -68,6 +70,7 @@ void MainWindow::on_botonDesconectar_clicked()
     this->ui->botonConectar->setEnabled(true);
     this->ui->botonDesconectar->setEnabled(false);
     this->ui->botonEnviar->setEnabled(false);
+    disconnect(this->ui->inputMensaje, &QLineEdit::returnPressed, this, &MainWindow::enterEnviar);
     if(this->ventana)
         this->ventana->close();
 }
@@ -108,6 +111,11 @@ void MainWindow::on_botonEnviar_clicked()
     if(mensaje.isEmpty()) return;
 
     this->client->enviarMensaje(mensaje);
+}
+
+void MainWindow::enterEnviar()
+{
+    this->on_botonEnviar_clicked();
 }
 
 void MainWindow::on_actionLista_de_usuarios_triggered()

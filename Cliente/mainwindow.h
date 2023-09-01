@@ -38,6 +38,8 @@ private slots:
 
     void on_botonEnviar_clicked();
 
+    void enterEnviar();
+
     void on_actionLista_de_usuarios_triggered();
 
     void listaRecibida(QStringList _lista);
