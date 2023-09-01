@@ -53,20 +53,16 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         
-    - name: Install Qt5/Qt6 (yaqti)
-      # You may pin to the exact commit or the version.
-      # uses: WillBrennan/yaqti@8182822afd102e931137d71da54f52a13597af8d
-      uses: WillBrennan/yaqti@2021.07.29
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3.3.0
       with:
-        # Qt version to pick 5.15.2 or 6.2.1
+        # Version of Qt to install
         version: '6.2.0'
-        # install os; linux, windows, or mac
-        os: 'linux'
-        # what platform are you installing for? desktop, winrt, android, or ios
-        platform: 'desktop'
-        # what optional Qt modules to install? qtcharts, qtnetworkauth ect...
+        # Target platform for build
+        target: 'desktop'
+        # Additional Qt modules to install
         modules: 'qtwebsockets'
-      
+        
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
