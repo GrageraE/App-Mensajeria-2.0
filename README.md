@@ -1,5 +1,8 @@
 # App-Mensajeria-2.0
-WIP - Nueva versión del programa, escrita desde cero
+[![Cliente - Linux](https://github.com/GrageraE/App-Mensajeria-2.0/actions/workflows/Cliente-linux-cmake.yml/badge.svg)](https://github.com/GrageraE/App-Mensajeria-2.0/actions/workflows/Cliente-linux-cmake.yml)
+[![Servidor - Linux](https://github.com/GrageraE/App-Mensajeria-2.0/actions/workflows/Servidor-linux-cmake.yml/badge.svg)](https://github.com/GrageraE/App-Mensajeria-2.0/actions/workflows/Servidor-linux-cmake.yml)
+
+Nueva versión del programa, escrita desde cero
 ## Lanzamientos
 Por el momento no se lanzarán versiones precompiladas, hasta que se hallan pulido las características del programa.
 ## Compilación
