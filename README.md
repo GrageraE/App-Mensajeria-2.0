@@ -4,7 +4,7 @@
 
 Nueva versión del programa, escrita desde cero
 ## Lanzamientos
-Por el momento no se lanzarán versiones precompiladas, hasta que se hallan pulido las características del programa.
+Están disponibles versiones precompiladas para Windows, Linux y Android. En caso de Linux, se necesitan instalar las dependencias requeridas por Qt, incluyendo el submódulo QtWebSockets.
 ## Compilación
 ### Requisitos
 1. Compilador de C++ que soporte Qt 6
