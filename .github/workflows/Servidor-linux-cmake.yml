@@ -40,3 +40,8 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build/Servidor-linux --config ${{env.BUILD_TYPE}}
 
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: Servidor-linux
+        path: ${{github.workspace}}/build/Servidor-linux
