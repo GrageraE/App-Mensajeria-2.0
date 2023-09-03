@@ -12,8 +12,8 @@ ventanaServidores::ventanaServidores(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("Lista de Servidores");
-    ui->tablaServidores->setColumnCount(3);
-    ui->tablaServidores->setHorizontalHeaderLabels({"Dirección", "Puerto", "Usuario"});
+    ui->tablaServidores->setColumnCount(4);
+    ui->tablaServidores->setHorizontalHeaderLabels({"Dirección", "Puerto", "Usuario", "Seguro"});
 
     QFile listaFile("./servidores.txt");
     if(listaFile.open(QIODevice::ReadOnly))
@@ -32,7 +32,10 @@ ventanaServidores::ventanaServidores(QWidget *parent) :
             ui->tablaServidores->setItem(i, 1, item);
             item = new QTableWidgetItem(entradaServidor["Usuario"].toString());
             ui->tablaServidores->setItem(i, 2, item);
-            this->listaServidores.push_back({entradaServidor["Usuario"].toString(), entradaServidor["Servidor"].toString(), entradaServidor["Puerto"].toString()});
+            item = new QTableWidgetItem(entradaServidor["Seguro"].toBool() ? "Si" : "No");
+            ui->tablaServidores->setItem(i, 3, item);
+            this->listaServidores.push_back({entradaServidor["Usuario"].toString(), entradaServidor["Servidor"].toString(),
+                                             entradaServidor["Puerto"].toString(), entradaServidor["Seguro"].toBool()});
         }
         listaFile.close();
     }
@@ -55,6 +58,7 @@ ventanaServidores::~ventanaServidores()
             entradaJson["Servidor"] = server.ip;
             entradaJson["Puerto"] = server.puerto;
             entradaJson["Usuario"] = server.nombreUsuario;
+            entradaJson["Seguro"] = server.seguro;
             json[QString::number(i)] = entradaJson;
             ++i;
         }
@@ -92,6 +96,7 @@ void ventanaServidores::on_botonConectar_clicked()
         this->resultado.ip = item->text();
         this->resultado.puerto = this->ui->tablaServidores->item(item->row(), 1)->text();
         this->resultado.nombreUsuario = this->ui->tablaServidores->item(item->row(), 2)->text();
+        this->resultado.seguro = this->ui->tablaServidores->item(item->row(), 3)->text() == "Si" ? true : false;
     }
     break;
     case 1: // Puerto
@@ -99,6 +104,7 @@ void ventanaServidores::on_botonConectar_clicked()
         this->resultado.ip = this->ui->tablaServidores->item(item->row(), 0)->text();
         this->resultado.puerto = item->text();
         this->resultado.nombreUsuario = this->ui->tablaServidores->item(item->row(), 2)->text();
+        this->resultado.seguro = this->ui->tablaServidores->item(item->row(), 3)->text() == "Si" ? true : false;
     }
     break;
     case 2: // Usuario
@@ -106,6 +112,15 @@ void ventanaServidores::on_botonConectar_clicked()
         this->resultado.ip = this->ui->tablaServidores->item(item->row(), 0)->text();
         this->resultado.puerto = this->ui->tablaServidores->item(item->row(), 1)->text();
         this->resultado.nombreUsuario = item->text();
+        this->resultado.seguro = this->ui->tablaServidores->item(item->row(), 3)->text() == "Si" ? true : false;
+    }
+    break;
+    case 3: // Seguro
+    {
+        this->resultado.ip = this->ui->tablaServidores->item(item->row(), 0)->text();
+        this->resultado.puerto = this->ui->tablaServidores->item(item->row(), 1)->text();
+        this->resultado.nombreUsuario = this->ui->tablaServidores->item(item->row(), 2)->text();
+        this->resultado.seguro = item->text() == "Si" ? true : false;
     }
     break;
     default: qDebug() <<" Error en la toma de datos";
@@ -131,6 +146,7 @@ void ventanaServidores::on_botonEliminar_clicked()
         datos.ip = item->text();
         datos.puerto = this->ui->tablaServidores->item(item->row(), 1)->text();
         datos.nombreUsuario = this->ui->tablaServidores->item(item->row(), 2)->text();
+        datos.seguro = this->ui->tablaServidores->item(item->row(), 3)->text() == "Si" ? true : false;
     }
     break;
     case 1: // Puerto
@@ -138,6 +154,7 @@ void ventanaServidores::on_botonEliminar_clicked()
         datos.ip = this->ui->tablaServidores->item(item->row(), 0)->text();
         datos.puerto = item->text();
         datos.nombreUsuario = this->ui->tablaServidores->item(item->row(), 2)->text();
+        datos.seguro = this->ui->tablaServidores->item(item->row(), 3)->text() == "Si" ? true : false;
     }
     break;
     case 2: // Usuario
@@ -145,14 +162,20 @@ void ventanaServidores::on_botonEliminar_clicked()
         datos.ip = this->ui->tablaServidores->item(item->row(), 0)->text();
         datos.puerto = this->ui->tablaServidores->item(item->row(), 1)->text();
         datos.nombreUsuario = item->text();
+        datos.seguro = this->ui->tablaServidores->item(item->row(), 3)->text() == "Si" ? true : false;
     }
     break;
-    default:
+    case 3: // Seguro
     {
-        qDebug() <<" Error en la toma de datos";
-        return;
+        datos.ip = this->ui->tablaServidores->item(item->row(), 0)->text();
+        datos.puerto = this->ui->tablaServidores->item(item->row(), 1)->text();
+        datos.nombreUsuario = this->ui->tablaServidores->item(item->row(), 2)->text();
+        datos.seguro = item->text() == "Si" ? true : false;
     }
+    break;
+    default: qDebug() <<" Error en la toma de datos";
     }
+
     this->ui->tablaServidores->removeRow(item->row());
     this->listaServidores.removeAll(datos);
 }

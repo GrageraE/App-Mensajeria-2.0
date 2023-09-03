@@ -147,7 +147,7 @@ void MainWindow::cierreListaUsuario()
     this->ventana = nullptr;
 }
 
-void MainWindow::on_actionLista_triggered()
+void MainWindow::on_actionLista_triggered() // Lista de servidores
 {
     if(this->client)
     {
@@ -162,6 +162,8 @@ void MainWindow::on_actionLista_triggered()
         this->ui->inputNombre->setText(result.nombreUsuario);
         this->ui->inputServidor->setText(result.ip);
         this->ui->inputPuerto->setText(result.puerto);
+        if(result.seguro) this->ui->checkSeguro->setCheckState(Qt::Checked);
+        else this->ui->checkSeguro->setCheckState(Qt::Unchecked);
     }
 }
 
@@ -174,6 +176,7 @@ void MainWindow::on_actionA_adir_triggered()
         return;
     }
     ventanaServidores v;
-    v.agregarDatos({this->ui->inputNombre->text(), this->ui->inputServidor->text(), this->ui->inputPuerto->text()});
+    v.agregarDatos({this->ui->inputNombre->text(), this->ui->inputServidor->text(),
+                    this->ui->inputPuerto->text(), this->ui->checkSeguro->isChecked()});
 }
 

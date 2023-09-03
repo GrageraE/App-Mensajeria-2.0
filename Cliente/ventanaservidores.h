@@ -18,10 +18,12 @@ public:
         QString nombreUsuario;
         QString ip;
         QString puerto;
+        bool seguro;
 
         bool operator== (const DatosServidor& other) const
         {
-            return (this->ip == other.ip && this->nombreUsuario == other.nombreUsuario && this->puerto == other.puerto);
+            return (this->ip == other.ip && this->nombreUsuario == other.nombreUsuario
+                    && this->puerto == other.puerto && this->seguro == other.seguro);
         }
     };
 
