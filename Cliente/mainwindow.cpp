@@ -38,6 +38,7 @@ void MainWindow::on_botonConectar_clicked()
     QString nombreUsuario = this->ui->inputNombre->text();
     QString puertoStr = this->ui->inputPuerto->text();
     QString servidor = this->ui->inputServidor->text();
+    bool seguro = this->ui->checkSeguro->isChecked();
     bool statusPort = true;
     int puerto = puertoStr.toInt(&statusPort);
     if(nombreUsuario.isEmpty() || servidor.isEmpty() || !statusPort)
@@ -45,7 +46,7 @@ void MainWindow::on_botonConectar_clicked()
         QMessageBox::critical(this, "Error", "El nombre o el servidor estan vacios; o bien el puerto no es un numero");
         return;
     }
-    this->client = new Cliente(servidor, puerto, nombreUsuario, this);
+    this->client = new Cliente(servidor, puerto, nombreUsuario, seguro, this);
     connect(this->client, &Cliente::mandarConexion, this, &MainWindow::usuarioConectado);
     connect(this->client, &Cliente::mandarDesconexion, this, &MainWindow::usuarioDesconectado);
     connect(this->client, &Cliente::mandarDesconexionServidor, this, &MainWindow::servidorDesconectado);

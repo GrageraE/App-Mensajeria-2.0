@@ -12,7 +12,7 @@ class Servidor : public QObject
 {
     Q_OBJECT
 public:
-    Servidor(int _puerto, const QString& _nombre, QObject* _parent);
+    Servidor(int _puerto, const QString& _nombre, bool seguro, const QString& passwd, QObject* _parent);
     ~Servidor();
 
     QMap<QString, QWebSocket*> getLista();
@@ -36,6 +36,10 @@ private slots:
     void mensajeRecibido(QString message);
 
     void desconectado();
+
+    void errorSetup(QWebSocketProtocol::CloseCode);
+
+    void errorSsl(const QList<QSslError>& e);
 
 private:
     int port;

@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->Logs->setReadOnly(true);
     ui->Parar->setEnabled(false);
+    ui->inputPasswd->setDisabled(true);
     this->setWindowTitle("Servidor");
 }
 
@@ -31,6 +32,8 @@ void MainWindow::on_Iniciar_clicked()
 {
     QString nombreServidor = ui->nombre->text();
     QString puertoStr = ui->puerto->text();
+    bool seguro = ui->checkSeguro->isChecked();
+    QString passwd = ui->inputPasswd->text();
     if(nombreServidor.isEmpty() || puertoStr.isEmpty())
     {
         QMessageBox::critical(this, "Error", "No se han especificado nombre o puerto del servidor");
@@ -44,7 +47,7 @@ void MainWindow::on_Iniciar_clicked()
         return;
     }
 
-    servidor = new Servidor(puerto, nombreServidor, this);
+    servidor = new Servidor(puerto, nombreServidor, seguro, passwd, this);
     connect(this->servidor, &Servidor::mostrarMensaje, this, &MainWindow::mostrarMensaje);
     connect(this->servidor, &Servidor::mostrarNuevoUsuario, this, &MainWindow::mostrarNuevoUsuario);
     connect(this->servidor, &Servidor::mostrarUsuarioDesconectado, this, &MainWindow::mostrarUsuarioDesconectado);
@@ -134,4 +137,9 @@ void MainWindow::cierreListaUsuario()
     disconnect(this->ventana, &ventanaListaUsuarios::expulsarUsuario, this, &MainWindow::expulsar);
     disconnect(this->ventana, &ventanaListaUsuarios::perdonarUsuario, this, &MainWindow::perdonar);
     this->ventana = nullptr;
+}
+
+void MainWindow::on_checkSeguro_clicked()   // Activamos o desactivamos el inputPasswd
+{
+    this->ui->inputPasswd->setEnabled(!this->ui->inputPasswd->isEnabled());
 }

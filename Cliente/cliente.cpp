@@ -2,17 +2,35 @@
 
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QtNetwork/QSslCertificate>
 #include <QtWebSockets/QWebSocket>
 #include <QMessageBox>
+#include <QFile>
 
-Cliente::Cliente(const QString& _servidor, int _puerto, const QString& _usuario, QObject* _parent)
+Cliente::Cliente(const QString& _servidor, int _puerto, const QString& _usuario, bool seguro, QObject* _parent)
     : QObject(_parent), usuario(_usuario), servidor(_servidor), puerto(_puerto), conectados(false)
 {
     qDebug() <<" Conectando a " << this->servidor <<" con nombre: " <<this->usuario;
     this->socket = new QWebSocket;
-    this->socket->open(QUrl("ws://" + this->servidor + ":" + QString::number(this->puerto)));
+    if(seguro)
+    {
+        QFile certFile("./server.cert");
+        if(!certFile.open(QIODevice::ReadOnly))
+            qDebug() <<" No se puede abrir server.cert";
+
+        QSslConfiguration conf;
+        QSslCertificate cert(&certFile, QSsl::Pem);
+        conf.addCaCertificate(cert);
+        certFile.close();
+        this->socket->setSslConfiguration(conf);
+        this->socket->open(QUrl("wss://" + this->servidor + ":" + QString::number(this->puerto)));
+    }
+    else
+        this->socket->open(QUrl("ws://" + this->servidor + ":" + QString::number(this->puerto)));
     connect(this->socket, &QWebSocket::connected, this, &Cliente::conectado);
     connect(this->socket, &QWebSocket::disconnected, this, &Cliente::desconectado);
+    if(seguro)
+        connect(this->socket, &QWebSocket::sslErrors, this, &Cliente::errorSsl);
 }
 
 Cliente::~Cliente()
@@ -124,4 +142,15 @@ void Cliente::pedirListaUsuarios()
     mensaje[USUARIO_STR] = this->usuario;
     QJsonDocument doc(mensaje);
     this->socket->sendTextMessage(doc.toJson());
+}
+
+void Cliente::errorSsl(const QList<QSslError>& _errores)
+{
+    for(const auto& error : _errores)
+    {
+        qDebug() <<" Error SSL: " <<error.errorString();
+    }
+    // Ignoraremos errores SSl (utilizamos certificados básicos)
+    // TODO: Poder configurar esto (mas/menos restrictivo)
+    this->socket->ignoreSslErrors(_errores);
 }

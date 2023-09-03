@@ -2,18 +2,51 @@
 
 #include <QtWebSockets/QWebSocketServer>
 #include <QtWebSockets/QWebSocket>
+#include <QtNetwork/QSslCertificate>
+#include <QtNetwork/QSslKey>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QFile>
 
-Servidor::Servidor(int _puerto, const QString& _nombre, QObject* _parent)
+Servidor::Servidor(int _puerto, const QString& _nombre, bool seguro, const QString& passwd, QObject* _parent)
     : QObject(_parent), port(_puerto), name(_nombre), banList()
 {
-    this->server = new QWebSocketServer(this->name, QWebSocketServer::NonSecureMode, this);
+    if(seguro)
+    {
+        this->server = new QWebSocketServer(this->name, QWebSocketServer::SecureMode, this);
+        QSslConfiguration conf;
+        QFile certFile("./server.cert");
+        QFile keyFile("./server.key");
+        if(!certFile.open(QIODevice::ReadOnly))
+        {
+            qDebug() <<"No se puede abrir ./server.key";
+        }
+        if(!keyFile.open(QIODevice::ReadOnly))
+        {
+            qDebug() <<" No se puede abrir ./server.cert";
+        }
+        QSslCertificate cert(&certFile, QSsl::Pem);
+        QSslKey key(&keyFile, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey, "localhost");
+        conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+        conf.setLocalCertificate(cert);
+        conf.setPrivateKey(key);
+        certFile.close();
+        keyFile.close();
+
+        this->server->setSslConfiguration(conf);
+    }
+    else
+    {
+        this->server = new QWebSocketServer(this->name, QWebSocketServer::NonSecureMode, this);
+    }
+
     if(this->server->listen(QHostAddress::Any, this->port))
     {
         qDebug() <<" Server listening on port " << this->port;
         connect(this->server, &QWebSocketServer::newConnection, this, &Servidor::nuevoUsuario);
+        connect(this->server, &QWebSocketServer::serverError, this, &Servidor::errorSetup);
+        if(seguro)
+            connect(this->server, &QWebSocketServer::sslErrors, this, &Servidor::errorSsl);
     }
     // Cargamos la lista de ban
     QFile fileBan("./ban.txt");
@@ -194,4 +227,17 @@ QMap<QString, QWebSocket*> Servidor::getLista()
 QStringList Servidor::getBaneados()
 {
     return this->banList;
+}
+
+void Servidor::errorSetup(QWebSocketProtocol::CloseCode e)
+{
+    qDebug() <<" Error en el arranque del servidor: " <<e;
+}
+
+void Servidor::errorSsl(const QList<QSslError>& _errores)
+{
+    for(const auto& error : _errores)
+    {
+        qDebug() <<" Error SSL: " <<error.errorString();
+    }
 }

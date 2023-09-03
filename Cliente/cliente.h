@@ -10,7 +10,7 @@ class Cliente : public QObject
 {
     Q_OBJECT
 public:
-    Cliente(const QString& _servidor, int _puerto, const QString& _usuario, QObject* _parent);
+    Cliente(const QString& _servidor, int _puerto, const QString& _usuario, bool seguro, QObject* _parent);
 
     ~Cliente();
 
@@ -35,6 +35,8 @@ private slots:
     void desconectado();
 
     void mensajeRecibido(QString _msg);
+
+    void errorSsl(const QList<QSslError>&);
 
 private:
     QWebSocket* socket;

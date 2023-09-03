@@ -42,6 +42,8 @@ private slots:
 
     void cierreListaUsuario();
 
+    void on_checkSeguro_clicked();
+
 private:
     Ui::MainWindow *ui;
 
