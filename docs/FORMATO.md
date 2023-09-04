@@ -2,14 +2,14 @@
 ## Definiciones
 * `TIPO_STR`: Indica la razón del envío. Puede tomar los valores:
   * `MENSAJE_STR`: Es un mensaje cualquiera
-  * `CONEXION_STR`: Mensaje de bienvenida, del cliente al servidor
+  * `CONEXION_STR`: Mensaje de bienvenida, del cliente al servidor. En modo seguro, se usa también para el manejo de la contraseña
   * `DESCONEXION_STR`: Mensaje de despedida (desconexión voluntaria) o denegación de acceso (si la manda el servidor)
   * `LISTA_STR`: Pide o envía la lista de usuarios conectados
 * `USUARIO_STR`: Es el emisor del mensaje. Si es un string vacío (`""`) este mensaje es envíado por el servidor
 * `CONTENIDO_STR`: Es el contenido del mensaje
   * Si el tipo es `LISTA_STR`, el contenido será la lista de usuarios
   * Si el tipo es `DESCONEXION_STR`, el contenido será la razón de denegación de acceso (nombre duplicado, expulsión, etc)
-  * Si el tipo es `CONEXION_STR`, este campo estará vacío
+  * Si el tipo es `CONEXION_STR`, este campo estará normalmente vacío. En modo seguro puede contener la contraseña 
 ## Ejemplos
 #### Mensaje 
 ```
@@ -26,6 +26,23 @@
   USUARIO_STR: <usuario>
 }
 ```
+#### Petición de contraseña
+```
+{
+  TIPO_STR: CONEXION_STR,
+  USUARIO_STR: ""
+}
+```
+NOTA: solo disponible en modo seguro
+#### Entrega de contraseña
+```
+{
+  TIPO_STR: CONEXION_STR,
+  USUARIO_STR: <usuario>,
+  CONTENIDO_STR: <contraseña>
+}
+```
+NOTA: solo disponible en modo seguro
 #### Desconexión voluntaria
 ```
 {
