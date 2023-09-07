@@ -18,9 +18,15 @@ Por el momento será una característica de la versión 2.0. Se puede probar una
 ### Windows y Android
 Lo mejor es usar Qt Creator
 ### Linux
-Debería compilarse con:
+Debería compilarse el Cliente con:
 ```
-mkdir build & cd build
-cmake ..
+mkdir build_Cliente && cd build_Cliente
+cmake ../Cliente
+make
+```
+Y el servidor con:
+```
+mkdir build_Servidor && cd build_Servidor
+cmake ../Servidor
 make
 ```
