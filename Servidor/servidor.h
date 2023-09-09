@@ -45,6 +45,8 @@ private:
     int port;
     QString name;
     QWebSocketServer* server;
+    bool sec = false;;
+    QString passwd = "";
 
     QMap<QString, QWebSocket*> listaUsuarios;
     QStringList banList;

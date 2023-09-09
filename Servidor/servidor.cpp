@@ -9,9 +9,9 @@
 #include <QFile>
 
 Servidor::Servidor(int _puerto, const QString& _nombre, bool seguro, const QString& passwd, QObject* _parent)
-    : QObject(_parent), port(_puerto), name(_nombre), banList()
+    : QObject(_parent), port(_puerto), name(_nombre), sec(seguro), passwd(passwd), banList()
 {
-    if(seguro)
+    if(this->sec)
     {
         this->server = new QWebSocketServer(this->name, QWebSocketServer::SecureMode, this);
         QSslConfiguration conf;
@@ -117,15 +117,7 @@ void Servidor::mensajeRecibido(QString message)
         qDebug() <<" Problema al parsear el mensaje";
     }
     auto caparazon = doc.object();
-    if(caparazon[TIPO_STR] == MENSAJE_STR)
-    {
-        // Mensaje recibido
-        Mensaje msj;
-        msj.usuario = caparazon[USUARIO_STR].toString();
-        msj.contenido = caparazon[CONTENIDO_STR].toString();
-        emit mostrarMensaje(msj);
-    }
-    else if(caparazon[TIPO_STR] == CONEXION_STR)
+    if(caparazon[TIPO_STR] == CONEXION_STR)
     {
         // Se ha conectado un usuario: revisamos su nombre y lo vinculamos a la lista
         if(this->listaUsuarios.contains(caparazon[USUARIO_STR].toString()))
@@ -138,7 +130,7 @@ void Servidor::mensajeRecibido(QString message)
             socketEmisor->sendTextMessage(QJsonDocument(mensaje).toJson());
             return;     // Mensaje privado
         }
-        else if(this->banList.contains(socketEmisor->peerAddress().toString()))
+        if(this->banList.contains(socketEmisor->peerAddress().toString()))
         {
             // Usuario baneado
             QJsonObject mensaje;
@@ -148,38 +140,62 @@ void Servidor::mensajeRecibido(QString message)
             socketEmisor->sendTextMessage(QJsonDocument(mensaje).toJson());
             return;
         }
+        if(this->sec && !this->passwd.isEmpty())
+        {
+            // Se requiere passwd
+            if(caparazon[CONTENIDO_STR].toString() != this->passwd)
+            {
+                QJsonObject msj;
+                msj[TIPO_STR] = CONEXION_STR;
+                msj[USUARIO_STR] = "";
+                socketEmisor->sendTextMessage(QJsonDocument(msj).toJson());
+                return;
+            }
+        }
         this->listaUsuarios[caparazon[USUARIO_STR].toString()] = socketEmisor;
         emit mostrarNuevoUsuario(caparazon[USUARIO_STR].toString());
     }
-    else if(caparazon[TIPO_STR] == DESCONEXION_STR)
+    // Esto se verifica si el usuario esta en la lista
+    if(this->listaUsuarios.value(caparazon[USUARIO_STR].toString()) == socketEmisor)
     {
-        // Se ha desconectado un usuario
-        disconnect(socketEmisor, &QWebSocket::textMessageReceived, this, &Servidor::mensajeRecibido);
-        disconnect(socketEmisor, &QWebSocket::disconnected, this, &Servidor::desconectado);
-        socketEmisor->deleteLater();
-        this->listaUsuarios.remove(caparazon[USUARIO_STR].toString());
-        emit mostrarUsuarioDesconectado(caparazon[USUARIO_STR].toString());
-    }
-    // Reenviamos a todos los usuarios, incluyendo al emisor
-    for(auto i = this->listaUsuarios.cbegin(); i != this->listaUsuarios.cend(); ++i)
-    {
-        qDebug() <<" Enviando a " <<i.key();
-        i.value()->sendTextMessage(message);
-    }
-    if(caparazon[TIPO_STR] == LISTA_STR)
-    {
-        // Nos han pedido la lista. Se la mandamos al usuario que la ha pedido
-        QJsonObject mensaje, listaMensaje;
-        mensaje[TIPO_STR] = LISTA_STR;
-        mensaje[USUARIO_STR] = "";
-        int i = 0;
-        for(auto it = this->listaUsuarios.cbegin(); it != this->listaUsuarios.cend(); ++it)
+        if(caparazon[TIPO_STR] == DESCONEXION_STR)
         {
-            listaMensaje[QString::number(i)] = it.key();
-            ++i;
+            // Se ha desconectado un usuario
+            disconnect(socketEmisor, &QWebSocket::textMessageReceived, this, &Servidor::mensajeRecibido);
+            disconnect(socketEmisor, &QWebSocket::disconnected, this, &Servidor::desconectado);
+            socketEmisor->deleteLater();
+            this->listaUsuarios.remove(caparazon[USUARIO_STR].toString());
+            emit mostrarUsuarioDesconectado(caparazon[USUARIO_STR].toString());
         }
-        mensaje[CONTENIDO_STR] = listaMensaje;
-        socketEmisor->sendTextMessage(QJsonDocument(mensaje).toJson());
+        else if(caparazon[TIPO_STR] == MENSAJE_STR)
+        {
+            // Mensaje recibido
+            Mensaje msj;
+            msj.usuario = caparazon[USUARIO_STR].toString();
+            msj.contenido = caparazon[CONTENIDO_STR].toString();
+            emit mostrarMensaje(msj);
+        }
+        // Reenviamos a todos los usuarios, incluyendo al emisor
+        for(auto i = this->listaUsuarios.cbegin(); i != this->listaUsuarios.cend(); ++i)
+        {
+            qDebug() <<" Enviando a " <<i.key();
+            i.value()->sendTextMessage(message);
+        }
+        if(caparazon[TIPO_STR] == LISTA_STR)
+        {
+            // Nos han pedido la lista. Se la mandamos al usuario que la ha pedido
+            QJsonObject mensaje, listaMensaje;
+            mensaje[TIPO_STR] = LISTA_STR;
+            mensaje[USUARIO_STR] = "";
+            int i = 0;
+            for(auto it = this->listaUsuarios.cbegin(); it != this->listaUsuarios.cend(); ++it)
+            {
+                listaMensaje[QString::number(i)] = it.key();
+                ++i;
+            }
+            mensaje[CONTENIDO_STR] = listaMensaje;
+            socketEmisor->sendTextMessage(QJsonDocument(mensaje).toJson());
+        }
     }
 }
 
@@ -188,6 +204,7 @@ void Servidor::desconectado()
     qDebug() <<" Usuario desconectado inesperadamente";
 
     QWebSocket* usuario = qobject_cast<QWebSocket*>(sender());
+    this->listaUsuarios.remove(this->listaUsuarios.key(usuario));
     usuario->deleteLater();
     emit mostrarUsuarioDesconectado(this->listaUsuarios.key(usuario));
 }

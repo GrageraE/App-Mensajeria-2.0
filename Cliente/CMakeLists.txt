@@ -29,6 +29,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         cliente.h cliente.cpp
         ventanalistausuarios.h ventanalistausuarios.cpp ventanalistausuarios.ui
         ventanaservidores.h ventanaservidores.cpp ventanaservidores.ui
+        ventanapasswd.h ventanapasswd.cpp ventanapasswd.ui
 
     )
 # Define target properties for Android with Qt 6 as:

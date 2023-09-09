@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Logs->setReadOnly(true);
     ui->Parar->setEnabled(false);
     ui->inputPasswd->setDisabled(true);
+    ui->inputPasswd->setEchoMode(QLineEdit::Password);
     this->setWindowTitle("Servidor");
 }
 
@@ -90,10 +91,13 @@ void MainWindow::mostrarNuevoUsuario(QString _nombre)
 
 void MainWindow::mostrarUsuarioDesconectado(QString _nombre)
 {
-    this->ui->Logs->appendPlainText("Se ha desconectado: " + _nombre);
-    if(this->ventana)
+    if(!_nombre.isEmpty())
     {
-        this->ventana->usuarioDesconectado(_nombre);
+        this->ui->Logs->appendPlainText("Se ha desconectado: " + _nombre);
+        if(this->ventana)
+        {
+            this->ventana->usuarioDesconectado(_nombre);
+        }
     }
 }
 

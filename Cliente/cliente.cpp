@@ -7,6 +7,8 @@
 #include <QMessageBox>
 #include <QFile>
 
+#include "ventanapasswd.h"
+
 Cliente::Cliente(const QString& _servidor, int _puerto, const QString& _usuario, bool seguro, QObject* _parent)
     : QObject(_parent), usuario(_usuario), servidor(_servidor), puerto(_puerto), conectados(false)
 {
@@ -88,6 +90,27 @@ void Cliente::mensajeRecibido(QString _msg)
     }
     else if(caparazon[TIPO_STR] == CONEXION_STR)
     {
+        if(caparazon[USUARIO_STR].toString().isEmpty())
+        {
+            // Nos piden passwd
+            ventanaPasswd v;
+            v.setModal(true);
+            if(v.exec() == QDialog::Accepted)
+            {
+                auto passwd = v.getResultado();
+                QJsonObject msj;
+                msj[TIPO_STR] = CONEXION_STR;
+                msj[USUARIO_STR] = this->usuario;
+                msj[CONTENIDO_STR] = passwd;
+                this->socket->sendTextMessage(QJsonDocument(msj).toJson());
+            }
+            else
+            {
+                // Nos desconectamos: no tenemos passwd
+                emit mandarDesconexionServidor("No se ha proporcionado contraseña válida");
+            }
+            return;
+        }
         // Se ha conectado un nuevo usuario
         emit mandarConexion(caparazon[USUARIO_STR].toString());
     }
