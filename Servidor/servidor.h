@@ -50,6 +50,7 @@ private:
 
     QMap<QString, QWebSocket*> listaUsuarios;
     QStringList banList;
+    QMap<QWebSocket*, int> contadores;
 
     const QString TIPO_STR = "TIPO";
     const QString LISTA_STR = "LISTA";

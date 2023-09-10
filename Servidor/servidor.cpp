@@ -145,6 +145,19 @@ void Servidor::mensajeRecibido(QString message)
             // Se requiere passwd
             if(caparazon[CONTENIDO_STR].toString() != this->passwd)
             {
+                if(this->contadores[socketEmisor] > 2)
+                {
+                    // Numero max de intentos superado -> Baneo
+                    QJsonObject expulsion;
+                    expulsion[TIPO_STR] = DESCONEXION_STR;
+                    expulsion[USUARIO_STR] = "";
+                    expulsion[CONTENIDO_STR] = "Baneado por 3 intentos fallidos";
+                    socketEmisor->sendTextMessage(QJsonDocument(expulsion).toJson());
+
+                    this->banList.push_back(socketEmisor->peerAddress().toString());
+                    return;
+                }
+                ++this->contadores[socketEmisor];
                 QJsonObject msj;
                 msj[TIPO_STR] = CONEXION_STR;
                 msj[USUARIO_STR] = "";
@@ -152,6 +165,7 @@ void Servidor::mensajeRecibido(QString message)
                 return;
             }
         }
+        this->contadores.remove(socketEmisor);
         this->listaUsuarios[caparazon[USUARIO_STR].toString()] = socketEmisor;
         emit mostrarNuevoUsuario(caparazon[USUARIO_STR].toString());
     }
@@ -205,6 +219,7 @@ void Servidor::desconectado()
 
     QWebSocket* usuario = qobject_cast<QWebSocket*>(sender());
     this->listaUsuarios.remove(this->listaUsuarios.key(usuario));
+    this->contadores.remove(usuario);
     usuario->deleteLater();
     emit mostrarUsuarioDesconectado(this->listaUsuarios.key(usuario));
 }
